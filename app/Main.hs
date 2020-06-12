@@ -9,15 +9,15 @@
 
 module Main (main) where
 
-import Data.ByteString.Lazy as BL
-import Data.Text.Lazy as TL
+import Data.ByteString.Lazy as BL (interact)
+import Data.Text.Lazy as TL ( fromChunks, toChunks )
 import Data.Text.Lazy.Encoding ( encodeUtf8, decodeUtf8 )
-import Data.Text.ICU ( NormalizationMode (..), normalize, fromUtf8 )
+import Data.Text.ICU ( NormalizationMode (NFC), normalize )
 
 main :: IO ()
 main = BL.interact (
          encodeUtf8 .
-         TL.fromStrict .
-         normalize NFC .
-         TL.toStrict .
+         TL.fromChunks .
+         map (normalize NFC) .
+         TL.toChunks . -- FIXME: Does this have correct grapheme boundaries?
          decodeUtf8 )
