@@ -1,0 +1,51 @@
+name:                normal-ha
+version:             0.1.0.0
+github:              "Davislor/normal-ha"
+license:             BSD3
+author:              "Loren B. Davis"
+maintainer:          "Lorehead@zoho.com"
+copyright:           "Copyright © 2020 Loren B. Davis"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/Davislor/normal-ha#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- bytestring >= 0.10
+- text >= 1.2
+- text-icu >= 0.7
+
+library:
+  source-dirs: src
+
+executables:
+  normal-ha-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - normal-ha
+
+tests:
+  normal-ha-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - normal-ha

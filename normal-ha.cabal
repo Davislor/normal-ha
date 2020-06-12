@@ -1,0 +1,71 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 5475238d907b6e5687d70527aa647e396658f2656b17a97bcb20002f111355f8
+
+name:           normal-ha
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/Davislor/normal-ha#readme>
+homepage:       https://github.com/Davislor/normal-ha#readme
+bug-reports:    https://github.com/Davislor/normal-ha/issues
+author:         Loren B. Davis
+maintainer:     Lorehead@zoho.com
+copyright:      Copyright © 2020 Loren B. Davis
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/Davislor/normal-ha
+
+library
+  exposed-modules:
+      Lib
+  other-modules:
+      Paths_normal_ha
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+    , bytestring >=0.10
+    , text >=1.2
+    , text-icu >=0.7
+  default-language: Haskell2010
+
+executable normal-ha-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_normal_ha
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , bytestring >=0.10
+    , normal-ha
+    , text >=1.2
+    , text-icu >=0.7
+  default-language: Haskell2010
+
+test-suite normal-ha-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_normal_ha
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , bytestring >=0.10
+    , normal-ha
+    , text >=1.2
+    , text-icu >=0.7
+  default-language: Haskell2010
