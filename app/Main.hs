@@ -41,16 +41,23 @@ lazyNormalize mode = toLazyByteString .
  - makes more deep copies than necessary, but will produce chunks that always
  - break on a grapheme boundary.  These will be short if typing in interactive
  - mode or long if running a batch job.
+ -
+ - The final grapheme in any chunk is always passed on to the next tail-
+ - recursive (modulo cons) call, as the first character of the next chunk might
+ - be a combining character that changes its canonical normalization.
  -}
         go left [] | left == T.empty = []
         go left []                   = [left]
-        go left (h:t)                = h':go residue t
+        go left (h:t) | length graphemesInReverse < 2
+                                     = go h t
+                      | otherwise    = h':go residue t
           where h' = ((TL.toStrict . TL.fromChunks) [left, middle, right])
                 graphemeBreaker = breakCharacter Current
-                lastGrapheme = Prelude.head (breaksRight graphemeBreaker h)
-                middle = brkPrefix lastGrapheme
-                right = brkBreak lastGrapheme
-                residue = brkSuffix lastGrapheme
+                graphemesInReverse = breaksRight graphemeBreaker h
+                penult = (head . tail) graphemesInReverse
+                middle = brkPrefix penult
+                right = brkBreak penult
+                residue = brkSuffix penult
 
 normalizeChunk :: NormalizationMode -> T.Text -> Builder
 {- Converts a strict chunk of Text to NFC normalized, UTF8-encoded form, then
