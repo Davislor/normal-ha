@@ -7,7 +7,7 @@
  - normal-ha: Perform canonical normalization of UTF-8 input.               -
  ----------------------------------------------------------------------------}
 
-module Main (main) where
+module Main ( lazyNormalize, main ) where
 
 import Data.ByteString.Builder ( Builder, toLazyByteString )
 import Data.ByteString.Builder.Extra (byteStringInsert)
@@ -20,10 +20,14 @@ import Data.Text.ICU ( NormalizationMode (NFC), LocaleName(Current),
   breakCharacter, breaksRight, brkBreak, brkPrefix, brkSuffix, normalize )
 
 main :: IO ()
-main = BL.interact (
-         toLazyByteString .
-         foldMap normalizeChunk .
-         decode )
+main = BL.interact (lazyNormalize NFC)
+
+lazyNormalize :: NormalizationMode -> BL.ByteString -> BL.ByteString
+{- A wrapper to normalize a lazy UTF-8 ByteString with Data.Text.ICU.normalize.
+ -}
+lazyNormalize mode = toLazyByteString .
+                     foldMap (normalizeChunk mode) .
+                     decode
 
 decode :: BL.ByteString -> [T.Text]
 {- Breaks the lazy ByteString into a list of strict ByteStrings, each of which
@@ -33,7 +37,9 @@ decode :: BL.ByteString -> [T.Text]
  - This uses the pure Breaker API, finding the last grapheme break in each
  - chunk and then copying the leftovers from the previous chunk, plus every-
  - thing up to the last grapheme boundary in this chunk, to a new chunk. This
- - makes more deep copies than necessary.
+ - makes more deep copies than necessary, but will produce chunks that always
+ - break on a grapheme boundary.  These will be short if typing in interactive
+ - mode or long if running a batch job.
  -}
 decode = go T.empty .
          TL.toChunks .
@@ -50,8 +56,13 @@ decode = go T.empty .
                 right = brkBreak lastGrapheme
                 residue = brkSuffix lastGrapheme
 
-normalizeChunk :: T.Text -> Builder
-normalizeChunk = byteStringInsert .
-                 E.encodeUtf8 .
-                 normalize NFC
+normalizeChunk :: NormalizationMode -> T.Text -> Builder
+{- Converts a strict chunk of Text to NFC normalized, UTF8-encoded form, then
+ - returns it as a Builder.  Each chunk will be flushed immediately, for the
+ - sake of interactive operation.  (But, if running on batch data, the chunks
+ - should be adequately large.)
+ -}
+normalizeChunk mode = byteStringInsert .
+                      E.encodeUtf8 .
+                      normalize mode
 
