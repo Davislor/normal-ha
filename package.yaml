@@ -29,7 +29,7 @@ dependencies:
 #  source-dirs: src
 
 executables:
-  normal-ha-exe:
+  normal-ha:
     main:                Main.hs
     source-dirs:         app
     ghc-options:

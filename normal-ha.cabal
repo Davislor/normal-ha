@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2b9e86371fce6923c42489cd2ea6ecc604fd5bdd4d20ced883eb1b064abd261b
+-- hash: c36741c46b54cf7b01ecaff0ff5ef305dcfd59609c47c63aa58c6aba66028f3e
 
 name:           normal-ha
 version:        0.1.0.0
@@ -25,7 +25,7 @@ source-repository head
   type: git
   location: https://github.com/Davislor/normal-ha
 
-executable normal-ha-exe
+executable normal-ha
   main-is: Main.hs
   other-modules:
       Paths_normal_ha
