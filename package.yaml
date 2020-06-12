@@ -37,6 +37,9 @@ executables:
     main:                strictTest.hs
     source-dirs:         test
 #   ghc-options:
+  normalTest:
+    main:                normalTest.hs
+    source-dirs:         test
 #    dependencies:
 #    - normal-ha
 
