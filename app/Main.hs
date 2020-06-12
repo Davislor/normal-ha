@@ -20,8 +20,7 @@ import Data.Text.ICU ( NormalizationMode (NFC), normalize )
 main :: IO ()
 main = BL.interact (
          toLazyByteString .
-         mconcat .
-         Prelude.map normalizeChunk .
+         foldMap normalizeChunk .
          decode )
 
 decode :: BL.ByteString -> [T.Text]
