@@ -12,11 +12,12 @@ module Main (main) where
 import Data.ByteString.Builder ( Builder, toLazyByteString )
 import Data.ByteString.Builder.Extra (byteStringInsert)
 import Data.ByteString.Lazy as BL ( ByteString, interact )
-import Data.Text as T -- (Text, empty)
-import Data.Text.Lazy as TL -- (Text, empty)
+import Data.Text as T (Text, empty)
+import Data.Text.Lazy as TL ( fromChunks, toChunks, toStrict )
 import Data.Text.Lazy.Encoding as LE (decodeUtf8)
 import Data.Text.Encoding as E (encodeUtf8)
-import Data.Text.ICU -- ( NormalizationMode (NFC), normalize )
+import Data.Text.ICU ( NormalizationMode (NFC), LocaleName(Current),
+  breakCharacter, breaksRight, brkBreak, brkPrefix, brkSuffix, normalize )
 
 main :: IO ()
 main = BL.interact (
@@ -35,7 +36,7 @@ decode :: BL.ByteString -> [T.Text]
  - makes more deep copies than necessary.
  -}
 decode = go T.empty .
-         toChunks .
+         TL.toChunks .
          LE.decodeUtf8
   where go :: T.Text -> [T.Text] -> [T.Text]
         go left [] | left == T.empty = []
