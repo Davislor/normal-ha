@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5475238d907b6e5687d70527aa647e396658f2656b17a97bcb20002f111355f8
+-- hash: 2b9e86371fce6923c42489cd2ea6ecc604fd5bdd4d20ced883eb1b064abd261b
 
 name:           normal-ha
 version:        0.1.0.0
@@ -25,20 +25,6 @@ source-repository head
   type: git
   location: https://github.com/Davislor/normal-ha
 
-library
-  exposed-modules:
-      Lib
-  other-modules:
-      Paths_normal_ha
-  hs-source-dirs:
-      src
-  build-depends:
-      base >=4.7 && <5
-    , bytestring >=0.10
-    , text >=1.2
-    , text-icu >=0.7
-  default-language: Haskell2010
-
 executable normal-ha-exe
   main-is: Main.hs
   other-modules:
@@ -49,7 +35,6 @@ executable normal-ha-exe
   build-depends:
       base >=4.7 && <5
     , bytestring >=0.10
-    , normal-ha
     , text >=1.2
     , text-icu >=0.7
   default-language: Haskell2010

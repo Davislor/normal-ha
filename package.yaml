@@ -25,8 +25,8 @@ dependencies:
 - text >= 1.2
 - text-icu >= 0.7
 
-library:
-  source-dirs: src
+#library:
+#  source-dirs: src
 
 executables:
   normal-ha-exe:
@@ -36,8 +36,8 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
-    dependencies:
-    - normal-ha
+#    dependencies:
+#    - normal-ha
 
 tests:
   normal-ha-test:
