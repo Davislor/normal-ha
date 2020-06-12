@@ -13,7 +13,7 @@ import Data.ByteString.Builder ( Builder, toLazyByteString )
 import Data.ByteString.Builder.Extra (byteStringInsert)
 import Data.ByteString.Lazy as BL ( ByteString, interact )
 import Data.Text as T ( Text, append, empty )
-import Data.Text.Lazy as TL ( fromChunks, toChunks, toStrict )
+import Data.Text.Lazy as TL (toChunks)
 import Data.Text.Lazy.Encoding as LE (decodeUtf8)
 import Data.Text.Encoding as E (encodeUtf8)
 import Data.Text.ICU ( NormalizationMode (NFC), LocaleName(Current),
@@ -50,14 +50,15 @@ lazyNormalize mode = toLazyByteString .
         go left []                   = [left]
         go left (h:t) | length graphemesInReverse < 2
                                      = go (T.append left h) t
+                      | brkSuffix ultimo /= T.empty =
+          error "Chunk contained something after its final break."
                       | otherwise    = h':go residue t
-          where h' = ((TL.toStrict . TL.fromChunks) [left, middle, right])
+          where h' = (T.append left right) -- Should this be evaluated strictly?
                 graphemeBreaker = breakCharacter Current
                 graphemesInReverse = breaksRight graphemeBreaker h
-                penult = (head . tail) graphemesInReverse
-                middle = brkPrefix penult
-                right = brkBreak penult
-                residue = brkSuffix penult
+                ultimo = head graphemesInReverse
+                right = brkPrefix ultimo
+                residue = brkBreak ultimo
 
 normalizeChunk :: NormalizationMode -> T.Text -> Builder
 {- Converts a strict chunk of Text to NFC normalized, UTF8-encoded form, then
