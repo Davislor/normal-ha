@@ -11,7 +11,11 @@ module Main (main) where
 
 import Data.ByteString.Lazy as BL
 import Data.Text.Lazy as TL
+import Data.Text.Lazy.Encoding as EL
 import Data.Text.ICU.Normalize (NormalizationMode, normalize)
 
 main :: IO ()
-main = BL.interact id
+main = BL.interact (
+         EL.encodeUtf8 .
+         id .
+         EL.decodeUtf8 )
