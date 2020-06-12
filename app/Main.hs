@@ -12,7 +12,7 @@ module Main ( lazyNormalize, main ) where
 import Data.ByteString.Builder ( Builder, toLazyByteString )
 import Data.ByteString.Builder.Extra (byteStringInsert)
 import Data.ByteString.Lazy as BL ( ByteString, interact )
-import Data.Text as T (Text, empty)
+import Data.Text as T ( Text, append, empty )
 import Data.Text.Lazy as TL ( fromChunks, toChunks, toStrict )
 import Data.Text.Lazy.Encoding as LE (decodeUtf8)
 import Data.Text.Encoding as E (encodeUtf8)
@@ -49,7 +49,7 @@ lazyNormalize mode = toLazyByteString .
         go left [] | left == T.empty = []
         go left []                   = [left]
         go left (h:t) | length graphemesInReverse < 2
-                                     = go h t
+                                     = go (T.append left h) t
                       | otherwise    = h':go residue t
           where h' = ((TL.toStrict . TL.fromChunks) [left, middle, right])
                 graphemeBreaker = breakCharacter Current
