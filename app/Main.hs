@@ -27,10 +27,11 @@ lazyNormalize :: NormalizationMode -> BL.ByteString -> BL.ByteString
  -}
 lazyNormalize mode = toLazyByteString .
                      foldMap (normalizeChunk mode) .
-                     decode
-
-decode :: BL.ByteString -> [T.Text]
-{- Breaks the lazy ByteString into a list of strict ByteStrings, each of which
+                     go T.empty .
+                     TL.toChunks .
+                     LE.decodeUtf8
+  where go :: T.Text -> [T.Text] -> [T.Text]
+ {- Breaks the lazy ByteString into a list of strict ByteStrings, each of which
  - ends on a grapheme boundary, and whose concatenation is the same as the
  - original input.
  -
@@ -41,16 +42,11 @@ decode :: BL.ByteString -> [T.Text]
  - break on a grapheme boundary.  These will be short if typing in interactive
  - mode or long if running a batch job.
  -}
-decode = go T.empty .
-         TL.toChunks .
-         LE.decodeUtf8
-  where go :: T.Text -> [T.Text] -> [T.Text]
         go left [] | left == T.empty = []
         go left []                   = [left]
-        go left (h:t)                  =
-          ((TL.toStrict . TL.fromChunks) [left, middle, right]):
-          (go residue t)
-          where graphemeBreaker = breakCharacter Current
+        go left (h:t)                = h':go residue t
+          where h' = ((TL.toStrict . TL.fromChunks) [left, middle, right])
+                graphemeBreaker = breakCharacter Current
                 lastGrapheme = Prelude.head (breaksRight graphemeBreaker h)
                 middle = brkPrefix lastGrapheme
                 right = brkBreak lastGrapheme
