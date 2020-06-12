@@ -9,13 +9,12 @@
 
 module Main (main) where
 
-import Data.ByteString.Lazy as BL
-import Data.Text.Lazy as TL
-import Data.Text.Lazy.Encoding as EL
-import Data.Text.ICU.Normalize (NormalizationMode, normalize)
+import Data.ByteString as B
+import Data.Text.Encoding as E
+import Data.Text.ICU ( NormalizationMode (..), normalize, fromUtf8 )
 
 main :: IO ()
-main = BL.interact (
-         EL.encodeUtf8 .
-         id .
-         EL.decodeUtf8 )
+main = B.interact (
+         E.encodeUtf8 .
+         normalize NFC .
+         E.decodeUtf8 )
