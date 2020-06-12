@@ -32,20 +32,17 @@ executables:
   normal-ha:
     main:                Main.hs
     source-dirs:         app
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
+#    ghc-options:
+  strictTest:
+    main:                strictTest.hs
+    source-dirs:         test
+#   ghc-options:
 #    dependencies:
 #    - normal-ha
 
 tests:
-  normal-ha-test:
-    main:                Spec.hs
-    source-dirs:         test
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - normal-ha
+   testNormalized:
+     main:               testNormalized.hs
+     source-dirs:        test
+#    dependencies:
+#    - normal-ha
