@@ -9,9 +9,14 @@
 
 module Main ( lazyNormalize, main ) where
 
-import Data.ByteString.Builder ( Builder, toLazyByteString )
-import Data.ByteString.Builder.Extra (byteStringInsert)
-import Data.ByteString.Lazy as BL ( ByteString, interact )
+import Data.ByteString as B (ByteString)
+{- A previous design generated the output as a Builder.  However, it consisted
+ - only of strict ByteStrings inserted with a hard break.  I therefore simplify
+ - it to generate a list of strict ByteStrings instead.
+ -}
+-- import Data.ByteString.Builder ( Builder, toLazyByteString )
+-- import Data.ByteString.Builder.Extra (byteStringInsert)
+import Data.ByteString.Lazy as BL ( ByteString, fromChunks, interact )
 import Data.Text as T ( Text, append, empty )
 import Data.Text.Lazy as TL (toChunks)
 import Data.Text.Lazy.Encoding as LE (decodeUtf8)
@@ -25,8 +30,8 @@ main = BL.interact (lazyNormalize NFC)
 lazyNormalize :: NormalizationMode -> BL.ByteString -> BL.ByteString
 {- A wrapper to normalize a lazy UTF-8 ByteString with Data.Text.ICU.normalize.
  -}
-lazyNormalize mode = toLazyByteString .
-                     foldMap (normalizeChunk mode) .
+lazyNormalize mode = BL.fromChunks .
+                     Prelude.map (normalizeChunk mode) .
                      go T.empty .
                      TL.toChunks .
                      LE.decodeUtf8
@@ -60,13 +65,11 @@ lazyNormalize mode = toLazyByteString .
                 right = brkPrefix ultimo
                 residue = brkBreak ultimo
 
-normalizeChunk :: NormalizationMode -> T.Text -> Builder
-{- Converts a strict chunk of Text to NFC normalized, UTF8-encoded form, then
- - returns it as a Builder.  Each chunk will be flushed immediately, for the
- - sake of interactive operation.  (But, if running on batch data, the chunks
- - should be adequately large.)
+normalizeChunk :: NormalizationMode -> T.Text -> B.ByteString
+{- Converts a strict chunk of Text to NFC normalized, UTF8-encoded form. Since
+ - each chunk was being flushed immediately anyway, this now returns a strict
+ - ByteString which will be combined into a list, then a lazy ByteString.)
  -}
-normalizeChunk mode = byteStringInsert .
-                      E.encodeUtf8 .
+normalizeChunk mode = E.encodeUtf8 .
                       normalize mode
 
