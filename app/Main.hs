@@ -17,12 +17,14 @@ import Data.ByteString as B (ByteString)
 -- import Data.ByteString.Builder ( Builder, toLazyByteString )
 -- import Data.ByteString.Builder.Extra (byteStringInsert)
 import Data.ByteString.Lazy as BL ( ByteString, fromChunks, interact )
-import Data.Text as T ( Text, append, empty )
+import Data.Text as T ( Text, append, empty, last )
 import Data.Text.Lazy as TL (toChunks)
 import Data.Text.Lazy.Encoding as LE (decodeUtf8)
 import Data.Text.Encoding as E (encodeUtf8)
 import Data.Text.ICU ( NormalizationMode (NFC), LocaleName(Current),
   breakCharacter, breaksRight, brkBreak, brkPrefix, brkSuffix, normalize )
+import Data.Text.ICU.Char ( GeneralCategory_ (GeneralCategory),
+  GeneralCategory(ControlChar), property )
 
 main :: IO ()
 main = BL.interact (lazyNormalize NFC)
@@ -47,18 +49,27 @@ lazyNormalize mode = BL.fromChunks .
  - break on a grapheme boundary.  These will be short if typing in interactive
  - mode or long if running a batch job.
  -
- - The final grapheme in any chunk is always passed on to the next tail-
- - recursive (modulo cons) call, as the first character of the next chunk might
- - be a combining character that changes its canonical normalization.
+ - With one exception, the final grapheme of the chunk is split off and passed
+ - to the next (tail-recursive modulo cons) call to be prepended to the follow-
+ - ing chunk.  A chunk ending in a Unicode control character is left intact,
+ - however.  This is because the next chunk might begin with a combining char-
+ - acter that changes the canonical normalization of a grapheme, but not a
+ - control character.  The motivation for adding code to handle this special
+ - case is so that, in interactive mode, the program will echo newlines.
  -}
-        go left [] | left == T.empty = []
-        go left []                   = [left]
-        go left (h:t) | length graphemesInReverse < 2
-                                     = go (T.append left h) t
+        go left [] | left == T.empty    = []
+        go left []                      = [left]
+        go left (h:t) | h == T.empty    = go left t
+                      | endsWithControl = chunk:(go T.empty t)
+                      | Prelude.length graphemesInReverse < 2
+                                        = go chunk t
                       | brkSuffix ultimo /= T.empty =
           error "Chunk contained something after its final break."
-                      | otherwise    = h':go residue t
-          where h' = (T.append left right) -- Should this be evaluated strictly?
+                      | otherwise       = h':(go residue t)
+          where h' = T.append left right -- Should this be evaluated strictly?
+                chunk = T.append left h  -- Should this be evaluated strictly?
+                endsWithControl = (property GeneralCategory . T.last) h ==
+                                  ControlChar
                 graphemeBreaker = breakCharacter Current
                 graphemesInReverse = breaksRight graphemeBreaker h
                 ultimo = head graphemesInReverse
