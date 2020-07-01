@@ -1,9 +1,9 @@
-module TextICUNormalizeLazy (lazyNormalize)
+module TextLazyICUNormalize (lazyNormalize)
   where
 
 import Data.Text as T ( Text, append, empty, last )
 import Data.Text.Lazy as TL ( Text, fromChunks, toChunks )
-import Data.Text.ICU ( NormalizationMode (NFC), LocaleName(Current),
+import Data.Text.ICU ( NormalizationMode, LocaleName(Current),
   breakCharacter, breaksRight, brkBreak, brkPrefix, brkSuffix, normalize )
 import Data.Text.ICU.Char ( GeneralCategory_ (GeneralCategory),
   GeneralCategory( ControlChar, LineSeparator, ParagraphSeparator ), property )

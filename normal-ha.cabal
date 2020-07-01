@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 063cdd1763b83f2fcfe4e7d3616edded619ec123edbf942ec13c7dafaa316571
+-- hash: a1e24810099c793ad179b9bf84b50b50b4e1aa0356c129059168e9ab4c3bb4ab
 
 name:           normal-ha
 version:        0.1.0.0
@@ -27,7 +27,7 @@ source-repository head
 
 library
   exposed-modules:
-      TextICUNormalizeLazy
+      TextLazyICUNormalize
   other-modules:
       Paths_normal_ha
   hs-source-dirs:
@@ -42,7 +42,7 @@ library
 executable normal-ha
   main-is: Main.hs
   other-modules:
-      TextICUNormalizeLazy
+      TextLazyICUNormalize
       Paths_normal_ha
   hs-source-dirs:
       app

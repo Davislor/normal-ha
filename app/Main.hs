@@ -14,7 +14,7 @@ import Data.Text.Encoding as E (encodeUtf8)
 import Data.Text.Lazy as TL (toChunks)
 import Data.Text.Lazy.Encoding as LE (decodeUtf8)
 import Data.Text.ICU ( NormalizationMode (NFC) )
-import TextICUNormalizeLazy (lazyNormalize)
+import TextLazyICUNormalize (lazyNormalize)
 
 main :: IO ()
 main = BL.interact (
