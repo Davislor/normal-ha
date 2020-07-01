@@ -18,25 +18,23 @@ import Data.ByteString as B (ByteString)
 -- import Data.ByteString.Builder.Extra (byteStringInsert)
 import Data.ByteString.Lazy as BL ( ByteString, fromChunks, interact )
 import Data.Text as T ( Text, append, empty, last )
-import Data.Text.Lazy as TL (toChunks)
-import Data.Text.Lazy.Encoding as LE (decodeUtf8)
-import Data.Text.Encoding as E (encodeUtf8)
+import Data.Text.Lazy as TL ( Text, fromChunks, toChunks )
+import Data.Text.Lazy.Encoding as LE ( decodeUtf8, encodeUtf8 )
 import Data.Text.ICU ( NormalizationMode (NFC), LocaleName(Current),
   breakCharacter, breaksRight, brkBreak, brkPrefix, brkSuffix, normalize )
 import Data.Text.ICU.Char ( GeneralCategory_ (GeneralCategory),
   GeneralCategory( ControlChar, LineSeparator, ParagraphSeparator ), property )
 
 main :: IO ()
-main = BL.interact (lazyNormalize NFC)
+main = BL.interact ( LE.encodeUtf8 . lazyNormalize NFC . LE.decodeUtf8 )
 
-lazyNormalize :: NormalizationMode -> BL.ByteString -> BL.ByteString
-{- A wrapper to normalize a lazy UTF-8 ByteString with Data.Text.ICU.normalize.
+lazyNormalize :: NormalizationMode -> TL.Text -> TL.Text
+{- A wrapper to normalize a lazy Text with Data.Text.ICU.normalize.
  -}
-lazyNormalize mode = BL.fromChunks .
-                     Prelude.map ( E.encodeUtf8 . normalize mode ) .
+lazyNormalize mode = TL.fromChunks .
+                     Prelude.map ( normalize mode ) .
                      go T.empty .
-                     TL.toChunks .
-                     LE.decodeUtf8
+                     TL.toChunks
   where go :: T.Text -> [T.Text] -> [T.Text]
 {- Breaks the lazy ByteString into a list of strict ByteStrings, each of which
  - ends on a grapheme boundary, and whose concatenation is the same as the
