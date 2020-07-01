@@ -33,12 +33,12 @@ lazyNormalize :: NormalizationMode -> BL.ByteString -> BL.ByteString
 {- A wrapper to normalize a lazy UTF-8 ByteString with Data.Text.ICU.normalize.
  -}
 lazyNormalize mode = BL.fromChunks .
-                     Prelude.map (normalizeChunk mode) .
+                     Prelude.map ( E.encodeUtf8 . normalize mode ) .
                      go T.empty .
                      TL.toChunks .
                      LE.decodeUtf8
   where go :: T.Text -> [T.Text] -> [T.Text]
- {- Breaks the lazy ByteString into a list of strict ByteStrings, each of which
+{- Breaks the lazy ByteString into a list of strict ByteStrings, each of which
  - ends on a grapheme boundary, and whose concatenation is the same as the
  - original input.
  -
@@ -81,11 +81,4 @@ lazyNormalize mode = BL.fromChunks .
                 right = brkPrefix ultimo
                 residue = brkBreak ultimo
 
-normalizeChunk :: NormalizationMode -> T.Text -> B.ByteString
-{- Converts a strict chunk of Text to NFC normalized, UTF8-encoded form. Since
- - each chunk was being flushed immediately anyway, this now returns a strict
- - ByteString which will be combined into a list, then a lazy ByteString.)
- -}
-normalizeChunk mode = E.encodeUtf8 .
-                      normalize mode
 
