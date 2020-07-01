@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a00396281d8f017e2da9812828db7cbc8005676eaca54c200c43f54f9e0cac19
+-- hash: 063cdd1763b83f2fcfe4e7d3616edded619ec123edbf942ec13c7dafaa316571
 
 name:           normal-ha
 version:        0.1.0.0
@@ -25,12 +25,13 @@ source-repository head
   type: git
   location: https://github.com/Davislor/normal-ha
 
-executable normal-ha
-  main-is: Main.hs
+library
+  exposed-modules:
+      TextICUNormalizeLazy
   other-modules:
       Paths_normal_ha
   hs-source-dirs:
-      app
+      src
   build-depends:
       base >=4.7 && <5
     , bytestring >=0.10
@@ -38,7 +39,23 @@ executable normal-ha
     , text-icu >=0.7
   default-language: Haskell2010
 
-executable normalTest
+executable normal-ha
+  main-is: Main.hs
+  other-modules:
+      TextICUNormalizeLazy
+      Paths_normal_ha
+  hs-source-dirs:
+      app
+      src
+  build-depends:
+      base >=4.7 && <5
+    , bytestring >=0.10
+    , text >=1.2
+    , text-icu >=0.7
+  default-language: Haskell2010
+
+test-suite normalTest
+  type: exitcode-stdio-1.0
   main-is: normalTest.hs
   other-modules:
       Paths_normal_ha
@@ -51,7 +68,8 @@ executable normalTest
     , text-icu >=0.7
   default-language: Haskell2010
 
-executable strictTest
+test-suite strictTest
+  type: exitcode-stdio-1.0
   main-is: strictTest.hs
   other-modules:
       Paths_normal_ha
